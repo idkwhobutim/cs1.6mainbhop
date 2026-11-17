@@ -2,7 +2,7 @@
   "required": true,
   "package": "gg.melty.cshudcraft.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["LivingEntityArmorMixin", "AdvancementMixin"],
-  "client": ["MinecraftClientMixin", "HeldItemRendererMixin", "GameRendererMixin", "PlayerEntityRendererMixin", "WorldRendererMixin", "GameRendererInvoker", "EntityLookMixin"],
+  "mixins": ["LivingEntityArmorMixin", "AdvancementMixin", "EntityAccessor", "EntityDimensionsMixin", "LivingEntityMoveMixin", "PlayerEntityMoveMixin", "ServerPlayNetworkHandlerMoveMixin"],
+  "client": ["MinecraftClientMixin", "HeldItemRendererMixin", "GameRendererMixin", "PlayerEntityRendererMixin", "WorldRendererMixin", "GameRendererInvoker", "EntityLookMixin", "KeyboardInputMixin", "ClientPlayerEntityMoveMixin"],
   "injectors": { "defaultRequire": 1 }
 }

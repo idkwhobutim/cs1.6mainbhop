@@ -10,7 +10,11 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    // movement unit tests only (the pure pmove core and its sheet reader)
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'com.google.code.gson:gson:2.10.1'
 }
+test { useJUnit() }
 loom {
     runs {
         // a second client for playing together on one PC: its own folder and name

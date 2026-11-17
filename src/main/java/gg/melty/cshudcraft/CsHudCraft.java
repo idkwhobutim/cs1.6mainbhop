@@ -100,6 +100,9 @@ public class CsHudCraft implements ClientModInitializer {
         HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Identifier.of(MOD_ID, "cs_hud"), (ctx, tick) -> {
             if (csActive()) HUD.render(ctx);
         });
+        HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Identifier.of(MOD_ID, "csmove_debug"),
+                (ctx, tick) -> gg.melty.cshudcraft.csmove.CsMoveClient.renderDebug(ctx));
+        gg.melty.cshudcraft.csmove.CsMoveClient.init();
         ClientPlayNetworking.registerGlobalReceiver(CsNet.Event.ID, (payload, ctx) -> ClientCs.onEvent(payload));
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             ClientCs.onModeChanged(enabled);

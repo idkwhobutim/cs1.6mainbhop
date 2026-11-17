@@ -117,6 +117,7 @@ public final class CsServer implements ModInitializer {
             if (player instanceof ServerPlayerEntity sp && isPrecious(st)) award(sp, "ore_mined", 0);
         });
         ServerTickEvents.END_SERVER_TICK.register(CsServer::tick);
+        gg.melty.cshudcraft.csmove.CsMoveServer.init();
         registerTestCommands();
     }
 

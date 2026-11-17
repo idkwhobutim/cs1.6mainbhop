@@ -30,6 +30,14 @@ public final class CsNet {
             b -> b.initializer(() -> "").syncWith(PacketCodecs.STRING, AttachmentSyncPredicate.all()));
 
     /**
+     * CS movement state of a player, for everyone to see: 0 = vanilla movement, 1 = CS movement standing, 2 = CS movement
+     * ducked. The server writes it; remote clients use it for the hull and the crouch pose. Not saved.
+     */
+    public static final AttachmentType<Integer> MOVE = AttachmentRegistry.create(
+            Identifier.of(CsHudCraft.MOD_ID, "move"),
+            b -> b.initializer(() -> 0).syncWith(PacketCodecs.VAR_INT, AttachmentSyncPredicate.all()));
+
+    /**
      * Client -> server. action: fire, knife, reload_start, reload_finish, select, buy, mode, throw.
      * arg: weapon / item id or extra word. nums: directions (x,y,z per pellet) or other numbers.
      */
@@ -65,5 +73,6 @@ public final class CsNet {
     static void register() {
         PayloadTypeRegistry.playC2S().register(Action.ID, Action.CODEC);
         PayloadTypeRegistry.playS2C().register(Event.ID, Event.CODEC);
+        gg.melty.cshudcraft.csmove.CsMoveNet.register();
     }
 }

@@ -65,6 +65,9 @@ public final class ClientCs {
     private static double lastFrame;
 
     private static boolean zoomed;
+
+    /** Zoomed in with a scope (CS movement slows scoped weapons, sheets/weapons.json speedScoped). */
+    public static boolean scoped() { return zoomed; }
     private static double rezoomAt;
     private static Flash flash;
     private static double flashUntil;
@@ -452,12 +455,15 @@ public final class ClientCs {
         nextShot = (now - nextShot) < w.cycle() * 1000 ? nextShot + w.cycle() * 1000 : now + w.cycle() * 1000;
 
         // CS spread: by stance, growing with each shot of a burst
-        double speed = p.getVelocity().horizontalLength() * 20.0; // blocks per second
-        boolean air = !p.isOnGround();
+        // stance from pmove while CS movement drives the player (grounded, 2D speed, ducking); vanilla's otherwise
+        gg.melty.cshudcraft.pmove.PlayerMoveState pm = gg.melty.cshudcraft.csmove.CsMoveClient.state();
+        double speed = pm != null ? pm.speed2D() : p.getVelocity().horizontalLength() * 20.0; // blocks per second
+        boolean air = pm != null ? !pm.onGround : !p.isOnGround();
+        boolean ducked = pm != null ? pm.ducking : p.isSneaking();
         boolean moving = speed > 2.4;
         double spread = air ? w.spreadAir() : moving ? w.spreadMove() : w.spreadBase();
         if (zoomed && w.zoomSpread() > 0 && !air && !moving) spread = w.zoomSpread();
-        if (p.isSneaking() && !air) spread *= 0.8;
+        if (ducked && !air) spread *= 0.8;
         spread *= Math.min(w.spreadMaxMul(), 1 + shotsFired * w.spreadGrow());
 
         Vec3d fwd = p.getRotationVec(1f);
@@ -798,10 +804,11 @@ public final class ClientCs {
     public static float crosshairSpread(ClientPlayerEntity p) {
         Sheets.Weapon w = local == null ? null : local.current();
         float gap = w == null ? 4 : w.crosshairGap();
-        double speed = p.getVelocity().horizontalLength() * 20.0;
-        if (!p.isOnGround()) gap *= 2.2f;
+        gg.melty.cshudcraft.pmove.PlayerMoveState pm = gg.melty.cshudcraft.csmove.CsMoveClient.state();
+        double speed = pm != null ? pm.speed2D() : p.getVelocity().horizontalLength() * 20.0;
+        if (pm != null ? !pm.onGround : !p.isOnGround()) gap *= 2.2f;
         else if (speed > 2.4) gap *= 1.6f;
-        if (p.isSneaking()) gap *= 0.8f;
+        if (pm != null ? pm.ducking : p.isSneaking()) gap *= 0.8f;
         if (w != null && !w.isKnife()) gap += Math.min(12, shotsFired * 1.5f);
         return gap;
     }
