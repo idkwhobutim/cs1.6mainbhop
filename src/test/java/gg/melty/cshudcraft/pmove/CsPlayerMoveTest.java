@@ -246,27 +246,9 @@ public class CsPlayerMoveTest {
 
     @Test public void autohopOptionRejumps() { assertTrue(countJumps(cfg().with("autohop", 1), true) > 5); }
 
-    @Test public void autobhopButtonRejumpsOnLanding() {
-        MovementConfig c = cfg();
-        CsPlayerMove m = new CsPlayerMove(c);
-        BoxWorld w = new BoxWorld(c, true);
-        PlayerMoveState s = onFloor();
-        run(m, s, idle(250), w, 2);
-        int landings = 0;
-        for (int i = 0; i < 200; i++) { // 10 s of held Space with the option on
-            m.tick(s, cmd(UserCmd.JUMP | UserCmd.AUTOBHOP, 0, 0, 0f, 250), w);
-            if (s.landed) landings++;
-        }
-        assertTrue(landings > 5);
-        // and without the bit the same input still jumps once (no autohop)
-        PlayerMoveState t = onFloor();
-        run(m, t, idle(250), w, 2);
-        int plain = 0;
-        for (int i = 0; i < 200; i++) {
-            m.tick(t, cmd(UserCmd.JUMP, 0, 0, 0f, 250), w);
-            if (t.landed) plain++;
-        }
-        assertEquals(1, plain);
+    @Test public void shippedSheetHasAutobhopOn() {
+        assertTrue(shipped().autohop);
+        assertTrue(countJumps(shipped(), true) > 5);
     }
 
     @Test public void freshPressAfterReleaseJumpsAgain() {

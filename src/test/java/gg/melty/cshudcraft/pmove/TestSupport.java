@@ -23,7 +23,9 @@ final class TestSupport {
         }
     }
 
-    static MovementConfig cfg() { return sheet().config; }
+    /** The shipped sheet with autohop off: the physics tests describe CS 1.6 itself (autobhop has its own tests). */
+    static MovementConfig cfg() { return sheet().config.with("autohop", 0); }
+    static MovementConfig shipped() { return sheet().config; }
 
     /** u/s -> blocks/s with this config. */
     static double bps(MovementConfig c, double units) { return units * c.unitScale; }

@@ -47,9 +47,6 @@ public final class CsConfig {
     /** CS 1.6 movement (pmove) on this client. Default on; /csmove on|off. sheets/movement.json cs_movement is the master switch above it. */
     public boolean csMovement() { return !"false".equalsIgnoreCase(props.getProperty("cs_movement", "true")); }
     public void setCsMovement(boolean on) { props.setProperty("cs_movement", Boolean.toString(on)); save(); }
-    /** Player option autobhop (default off): holding Space re-jumps the moment you land. /csmove autobhop toggles it. */
-    public boolean autobhop() { return "true".equalsIgnoreCase(props.getProperty("autobhop", "false")); }
-    public void setAutobhop(boolean on) { props.setProperty("autobhop", Boolean.toString(on)); save(); }
     /** Mouse speed multiplier while zoomed (on top of CS's fov scaling). [ and ] change it in 10% steps. */
     public double scopeSens() {
         try { return Double.parseDouble(props.getProperty("scope_sens", "1.0")); } catch (Exception e) { return 1.0; }

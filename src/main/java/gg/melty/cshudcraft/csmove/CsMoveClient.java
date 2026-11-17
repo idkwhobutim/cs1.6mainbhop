@@ -75,13 +75,6 @@ public final class CsMoveClient {
                             c.getSource().sendFeedback(Text.literal("CS movement off (vanilla movement)"));
                             return Command.SINGLE_SUCCESS;
                         }))
-                        .then(ClientCommandManager.literal("autobhop").executes(c -> {
-                            boolean on = !CsHudCraft.CONFIG.autobhop();
-                            CsHudCraft.CONFIG.setAutobhop(on);
-                            String note = CsMove.sheet().value("autobhop_allowed") == 0 ? " (but sheets/movement.json autobhop_allowed = 0)" : "";
-                            c.getSource().sendFeedback(Text.literal("autobhop " + (on ? "on: hold Space to hop on landing" : "off") + note));
-                            return Command.SINGLE_SUCCESS;
-                        }))
                         .then(ClientCommandManager.literal("status").executes(c -> {
                             String why = !CsMove.master() ? "sheet cs_movement = 0"
                                     : !serverMove ? "this server does not run CS movement"
@@ -169,7 +162,6 @@ public final class CsMoveClient {
         if (o.jumpKey.isPressed()) buttons |= UserCmd.JUMP;
         if (held(mc, o.sneakKey)) buttons |= UserCmd.DUCK;
         if (held(mc, o.sprintKey)) buttons |= UserCmd.WALK;
-        if (CsHudCraft.CONFIG.autobhop() && CsMove.sheet().value("autobhop_allowed") != 0) buttons |= UserCmd.AUTOBHOP;
         if (ClientCs.scoped()) buttons |= CsMove.Buttons.SCOPED;
         float forward = (o.forwardKey.isPressed() ? 1 : 0) - (o.backKey.isPressed() ? 1 : 0);
         float side = (o.rightKey.isPressed() ? 1 : 0) - (o.leftKey.isPressed() ? 1 : 0);

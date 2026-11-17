@@ -78,9 +78,7 @@ public final class CsMove {
         double gravity = p.hasStatusEffect(StatusEffects.SLOW_FALLING) ? c.value("slow_fall_gravity_mul") : 1;
         StatusEffectInstance lev = p.getStatusEffect(StatusEffects.LEVITATION);
         double levitate = lev == null ? 0 : c.value("levitation_speed") * (lev.getAmplifier() + 1);
-        int mask = Buttons.PMOVE_MASK;
-        if (c.value("autobhop_allowed") == 0) mask &= ~UserCmd.AUTOBHOP; // the sheet can forbid the player option
-        return new UserCmd(buttons & mask, forward, side, yawPrev, yawCur, pitchPrev, pitchCur,
+        return new UserCmd(buttons & Buttons.PMOVE_MASK, forward, side, yawPrev, yawCur, pitchPrev, pitchCur,
                 (float) speed, (float) jump, (float) gravity, (float) levitate);
     }
 
@@ -90,7 +88,7 @@ public final class CsMove {
         public static final int SCOPED = 8;
         /** Client is leaving CS movement (toggle off, riding, ...): the server hands the player back to vanilla. */
         public static final int LEAVE = 16;
-        public static final int PMOVE_MASK = UserCmd.JUMP | UserCmd.DUCK | UserCmd.WALK | UserCmd.AUTOBHOP;
+        public static final int PMOVE_MASK = UserCmd.JUMP | UserCmd.DUCK | UserCmd.WALK;
     }
 
     // ------------------------------------------------------------------ hull
