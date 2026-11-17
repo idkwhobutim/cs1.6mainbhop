@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * CS movement reads Ctrl (duck) and Shift (walk) itself, so the same keys must not also sprint or sneak: the input that
+ * CS movement reads Shift (duck) and Ctrl (walk) itself, so the same keys must not also sprint or sneak: the input that
  * vanilla and the server see keeps WASD and jump and drops sneak and sprint.
  */
 @Mixin(KeyboardInput.class)

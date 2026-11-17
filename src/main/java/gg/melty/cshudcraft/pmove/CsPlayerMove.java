@@ -27,7 +27,8 @@ public final class CsPlayerMove {
     public void tick(PlayerMoveState s, UserCmd cmd, MoveWorld w) {
         boolean held = (cmd.buttons & UserCmd.JUMP) != 0;
         s.landed = false;
-        s.jumpArmed = held && (c.autohop || (s.prevButtons & UserCmd.JUMP) == 0);
+        boolean auto = c.autohop || (cmd.buttons & UserCmd.AUTOBHOP) != 0;
+        s.jumpArmed = held && (auto || (s.prevButtons & UserCmd.JUMP) == 0);
         for (int i = 0; i < c.substeps; i++) step(s, cmd, i, w);
         s.prevButtons = cmd.buttons;
     }
@@ -40,7 +41,7 @@ public final class CsPlayerMove {
         s.pitch = pitch;
         s.impactVy = 0;
         clampVelocity(s);
-        if (c.autohop && (cmd.buttons & UserCmd.JUMP) != 0) s.jumpArmed = true;
+        if ((c.autohop || (cmd.buttons & UserCmd.AUTOBHOP) != 0) && (cmd.buttons & UserCmd.JUMP) != 0) s.jumpArmed = true;
         if (s.ladderLockout > 0) s.ladderLockout = Math.max(0, s.ladderLockout - dt);
         if (s.jumpSlow > 0) s.jumpSlow = Math.max(0, s.jumpSlow - dt);
         updateDuck(s, cmd, w);

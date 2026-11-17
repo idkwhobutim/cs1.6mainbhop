@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Client side of CS movement: samples the keys, predicts with the same core the server runs, commits the result to the
  * local player, sends the input, and applies the server's corrections (set state, replay the inputs it has not seen).
- * Controls: WASD, Space (jump), the vanilla Sprint key (Ctrl) = duck, the vanilla Sneak key (Shift) = walk. They stay
+ * Controls: WASD, Space (jump), the vanilla Sneak key (Shift) = duck, the vanilla Sprint key (Ctrl) = walk. They stay
  * rebindable in Controls; in CS movement those two keys no longer sprint or sneak.
  */
 public final class CsMoveClient {
@@ -68,6 +68,13 @@ public final class CsMoveClient {
                             c.getSource().sendFeedback(Text.literal("CS movement off (vanilla movement)"));
                             return Command.SINGLE_SUCCESS;
                         }))
+                        .then(ClientCommandManager.literal("autobhop").executes(c -> {
+                            boolean on = !CsHudCraft.CONFIG.autobhop();
+                            CsHudCraft.CONFIG.setAutobhop(on);
+                            String note = CsMove.sheet().value("autobhop_allowed") == 0 ? " (but sheets/movement.json autobhop_allowed = 0)" : "";
+                            c.getSource().sendFeedback(Text.literal("autobhop " + (on ? "on: hold Space to hop on landing" : "off") + note));
+                            return Command.SINGLE_SUCCESS;
+                        }))
                         .then(ClientCommandManager.literal("status").executes(c -> {
                             String why = !CsMove.master() ? "sheet cs_movement = 0"
                                     : !serverMove ? "this server does not run CS movement"
@@ -79,7 +86,7 @@ public final class CsMoveClient {
                         }))));
     }
 
-    /** CS movement owns the local player right now: vanilla Ctrl / Shift must not sprint or sneak. */
+    /** CS movement owns the local player right now: vanilla Shift / Ctrl must not sprint or sneak. */
     public static boolean driving() { return driving; }
 
     /** The local player's pmove state while CS movement drives them, else null (spread, HUD and the debug overlay read it). */
@@ -142,8 +149,9 @@ public final class CsMoveClient {
         GameOptions o = mc.options;
         int buttons = 0;
         if (o.jumpKey.isPressed()) buttons |= UserCmd.JUMP;
-        if (o.sprintKey.isPressed()) buttons |= UserCmd.DUCK;
-        if (o.sneakKey.isPressed()) buttons |= UserCmd.WALK;
+        if (o.sneakKey.isPressed()) buttons |= UserCmd.DUCK;
+        if (o.sprintKey.isPressed()) buttons |= UserCmd.WALK;
+        if (CsHudCraft.CONFIG.autobhop() && CsMove.sheet().value("autobhop_allowed") != 0) buttons |= UserCmd.AUTOBHOP;
         if (ClientCs.scoped()) buttons |= CsMove.Buttons.SCOPED;
         float forward = (o.forwardKey.isPressed() ? 1 : 0) - (o.backKey.isPressed() ? 1 : 0);
         float side = (o.rightKey.isPressed() ? 1 : 0) - (o.leftKey.isPressed() ? 1 : 0);

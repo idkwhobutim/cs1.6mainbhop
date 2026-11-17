@@ -8,6 +8,8 @@ package gg.melty.cshudcraft.pmove;
  */
 public final class UserCmd {
     public static final int JUMP = 1, DUCK = 2, WALK = 4;
+    /** Player option "autobhop": holding jump re-jumps the moment the player lands (bits 8 and 16 are the game side's, see CsMove.Buttons). */
+    public static final int AUTOBHOP = 32;
 
     public final int buttons;
     public final float forward, side;
