@@ -55,6 +55,7 @@ public final class CsMoveClient {
             serverMove = false;
             reset();
         });
+        CsMove.isLocalPlayer = e -> e == MinecraftClient.getInstance().player;
         CsMove.clientTravel = e -> e instanceof ClientPlayerEntity p && travel(p);
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, access) -> dispatcher.register(
                 ClientCommandManager.literal("csmove")
@@ -70,6 +71,7 @@ public final class CsMoveClient {
                         }))
                         .then(ClientCommandManager.literal("off").executes(c -> {
                             CsHudCraft.CONFIG.setCsMovement(false);
+                            refresh();
                             c.getSource().sendFeedback(Text.literal("CS movement off (vanilla movement)"));
                             return Command.SINGLE_SUCCESS;
                         }))
@@ -96,6 +98,14 @@ public final class CsMoveClient {
 
     /** The local player's pmove state while CS movement drives them, else null (spread, HUD and the debug overlay read it). */
     public static PlayerMoveState state() { return driving && ctl != null ? ctl.state : null; }
+
+    /** Re-check right now whether CS movement should still own the player (F6, /csmove on|off): switching off takes effect this tick, not on the next travel call. */
+    public static void refresh() {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        ClientPlayerEntity p = mc.player;
+        if (p == null || ctl == null) return;
+        if (!wants(mc, p)) leave(p);
+    }
 
     private static void reset() {
         CsMove.setLocal(null, null);

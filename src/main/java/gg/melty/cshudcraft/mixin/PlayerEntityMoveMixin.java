@@ -1,8 +1,6 @@
 package gg.melty.cshudcraft.mixin;
 
-import gg.melty.cshudcraft.CsNet;
 import gg.melty.cshudcraft.csmove.CsMove;
-import gg.melty.cshudcraft.csmove.MoveCtl;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
@@ -19,8 +17,7 @@ public abstract class PlayerEntityMoveMixin {
     @Inject(method = "updatePose", at = @At("TAIL"), require = 0)
     private void cshudcraft$pose(CallbackInfo ci) {
         PlayerEntity p = (PlayerEntity) (Object) this;
-        MoveCtl ctl = CsMove.ctlOf(p);
-        int mode = ctl != null ? (ctl.state.ducking ? 2 : 1) : p.getAttachedOrElse(CsNet.MOVE, 0);
+        int mode = CsMove.modeOf(p);
         if (mode == 0) return;
         EntityPose now = p.getPose();
         if (now != EntityPose.STANDING && now != EntityPose.CROUCHING) return;

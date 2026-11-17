@@ -122,13 +122,31 @@ public final class CsMove {
             height = c.hullHeight(ctl.state.ducking);
             eye = c.eyeHeight(ctl.state);
         } else {
-            int mode = p.getAttachedOrElse(CsNet.MOVE, 0); // remote players: 0 vanilla, 1 standing, 2 ducked (server writes it)
+            int mode = modeOf(p); // remote players: 0 vanilla, 1 standing, 2 ducked (server writes it)
             if (mode == 0) return null;
             height = c.hullHeight(mode == 2);
             eye = mode == 2 ? c.eyeDuck : c.eyeStand;
         }
         float scale = p.getScale(); // the scale attribute still applies
         return EntityDimensions.changing((float) c.hullWidth * scale, (float) height * scale).withEyeHeight((float) eye * scale);
+    }
+
+    /** Set by the client: is this entity the local player? */
+    static volatile java.util.function.Predicate<Entity> isLocalPlayer;
+
+    /**
+     * 0 = vanilla, 1 = CS movement standing, 2 = ducked, for hull and pose. The driving controller decides when there is
+     * one; the local player never trusts the synced attachment (so switching CS movement off is instant); everybody
+     * else shows what the server wrote.
+     */
+    public static int modeOf(PlayerEntity p) {
+        MoveCtl ctl = ctlOf(p);
+        if (ctl != null) return ctl.state.ducking ? 2 : 1;
+        if (p.getEntityWorld().isClient()) {
+            java.util.function.Predicate<Entity> h = isLocalPlayer;
+            if (h != null && h.test(p)) return 0;
+        }
+        return p.getAttachedOrElse(CsNet.MOVE, 0);
     }
 
     /** True if CS movement currently owns this player's movement on this side. */

@@ -156,12 +156,14 @@ public class CsHudCraft implements ClientModInitializer {
         enabled = on;
         vanillaDrawn = false;
         if (save) CONFIG.setEnabled(on);
+        gg.melty.cshudcraft.csmove.CsMoveClient.refresh();
         MinecraftClient mc = MinecraftClient.getInstance();
         if (!ASSETS.loaded()) {
             if (mc.player != null) mc.player.sendMessage(Text.translatable("cshudcraft.missing", String.valueOf(ASSETS.error())).formatted(Formatting.RED), true);
             return;
         }
         ClientCs.onModeChanged(on);
+        gg.melty.cshudcraft.csmove.CsMoveClient.refresh(); // F6 off: CS movement stops this tick, the player is vanilla again
         if (on) {
             HUD.fadeIn();
             CsSounds.play(ASSETS, CsSounds.HUD_ON, CsSounds.LOCK_LOAD);

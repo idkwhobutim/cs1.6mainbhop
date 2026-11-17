@@ -70,6 +70,8 @@ public final class CsMoveServer {
             if (s != null) handBack(p, s);
             return;
         }
+        CsState cs = p.getAttached(CsNet.STATE);
+        if (cs != null && !cs.csMode) return; // the player switched CS mode off
         if (CsMove.exempt(p) || c.v().size() < 9) return;
         MovementConfig cfg = CsMove.cfg();
         Slot s = SLOTS.computeIfAbsent(p.getUuid(), k -> new Slot());
@@ -95,7 +97,9 @@ public final class CsMoveServer {
             ServerPlayerEntity p = server.getPlayerManager().getPlayer(e.getKey());
             Slot s = e.getValue();
             if (p == null || p.isRemoved()) { gone.add(e.getKey()); continue; }
-            if (!master || CsMove.exempt(p) || now - s.lastCmdTick > (int) cfg.value("cmd_timeout_ticks")) {
+            CsState cs = p.getAttached(CsNet.STATE);
+            boolean csOff = cs != null && !cs.csMode; // F6 off: the server's own record, in case the client's LEAVE never arrives
+            if (!master || csOff || CsMove.exempt(p) || now - s.lastCmdTick > (int) cfg.value("cmd_timeout_ticks")) {
                 handBack(p, s);
                 continue;
             }
