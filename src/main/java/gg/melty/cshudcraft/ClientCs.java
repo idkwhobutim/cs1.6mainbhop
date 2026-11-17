@@ -65,9 +65,6 @@ public final class ClientCs {
     private static double lastFrame;
 
     private static boolean zoomed;
-
-    /** Zoomed in with a scope (CS movement slows scoped weapons, sheets/weapons.json speedScoped). */
-    public static boolean scoped() { return zoomed; }
     private static double rezoomAt;
     private static Flash flash;
     private static double flashUntil;

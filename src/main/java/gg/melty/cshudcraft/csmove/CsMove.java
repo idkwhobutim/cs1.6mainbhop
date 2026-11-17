@@ -138,7 +138,7 @@ public final class CsMove {
     /** LivingEntity.travel for a player: CS movement replaces it (client: predicts and sends; server: never runs vanilla travel for a driven player). */
     public static boolean cancelTravel(Entity e) {
         if (!(e instanceof PlayerEntity)) return false;
-        if (e.getEntityWorld().isClient) {
+        if (e.getEntityWorld().isClient()) {
             java.util.function.Predicate<Entity> h = clientTravel;
             return h != null && h.test(e);
         }
