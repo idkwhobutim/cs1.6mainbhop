@@ -14,7 +14,12 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
+import gg.melty.cshudcraft.mixin.KeyBindingAccessor;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.option.StickyKeyBinding;
+import net.minecraft.client.util.InputUtil;
+import org.lwjgl.glfw.GLFW;
 import net.minecraft.text.Text;
 
 import java.util.ArrayDeque;
@@ -117,6 +122,9 @@ public final class CsMoveClient {
         HISTORY.clear();
         haveLast = false;
         old.release(p);
+        GameOptions o = MinecraftClient.getInstance().options;
+        if (o.sneakKey instanceof StickyKeyBinding s) s.untoggle();
+        if (o.sprintKey instanceof StickyKeyBinding s) s.untoggle();
         if (!sentLeave && ClientPlayNetworking.canSend(CsMoveNet.Cmd.ID)) {
             sentLeave = true;
             ClientPlayNetworking.send(new CsMoveNet.Cmd(++seq, CsMove.Buttons.LEAVE, List.of(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d)));
@@ -149,8 +157,8 @@ public final class CsMoveClient {
         GameOptions o = mc.options;
         int buttons = 0;
         if (o.jumpKey.isPressed()) buttons |= UserCmd.JUMP;
-        if (o.sneakKey.isPressed()) buttons |= UserCmd.DUCK;
-        if (o.sprintKey.isPressed()) buttons |= UserCmd.WALK;
+        if (held(mc, o.sneakKey)) buttons |= UserCmd.DUCK;
+        if (held(mc, o.sprintKey)) buttons |= UserCmd.WALK;
         if (CsHudCraft.CONFIG.autobhop() && CsMove.sheet().value("autobhop_allowed") != 0) buttons |= UserCmd.AUTOBHOP;
         if (ClientCs.scoped()) buttons |= CsMove.Buttons.SCOPED;
         float forward = (o.forwardKey.isPressed() ? 1 : 0) - (o.backKey.isPressed() ? 1 : 0);
@@ -172,6 +180,21 @@ public final class CsMoveClient {
                 List.of((double) forward, (double) side, (double) cmd.yawPrev, (double) cmd.yawCur, (double) cmd.pitchPrev,
                         (double) cmd.pitchCur, s.x, s.y, s.z)));
         return true;
+    }
+
+    /**
+     * Is the physical key held? Duck and walk are hold keys: Minecraft's own "Toggle Sneak / Sprint" options would
+     * make isPressed() latch on and off, so the key itself is read (keyboard or mouse button). Falls back to
+     * isPressed() if the binding's key can't be read.
+     */
+    private static boolean held(MinecraftClient mc, KeyBinding k) {
+        if (!(k instanceof KeyBindingAccessor a) || a.cshudcraft$getBoundKey() == null) return k.isPressed();
+        if (k.isUnbound() || mc.currentScreen != null || !mc.isWindowFocused()) return false;
+        InputUtil.Key key = a.cshudcraft$getBoundKey();
+        if (key.getCategory() == InputUtil.Type.MOUSE) {
+            return GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), key.getCode()) == GLFW.GLFW_PRESS;
+        }
+        return InputUtil.isKeyPressed(mc.getWindow(), key.getCode());
     }
 
     private static void onCorrect(CsMoveNet.Correct c) {
